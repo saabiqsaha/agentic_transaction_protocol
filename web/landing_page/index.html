@@ -98,8 +98,18 @@
     </nav>
 
     <!-- SECTION 1: The Hook -->
-    <section class="min-h-screen flex items-center justify-center px-6">
-        <h1 class="font-serif text-6xl md:text-8xl text-center leading-tight reveal-text visible">
+    <section class="min-h-screen flex items-center justify-center px-6 relative overflow-hidden">
+        <!-- Cloud background with fade out effect at bottom -->
+        <div class="absolute inset-0 -z-10">
+            <!-- Cloud image positioned at top -->
+            <div class="absolute inset-0 bg-cover bg-top bg-no-repeat" 
+                 style="background-image: url('assets/clouds.png'); opacity: 0.7;">
+            </div>
+            <!-- Gradient fade - clouds visible at top, fading out towards bottom -->
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent via-40% via-[#Fdfbf7]/60 to-[#Fdfbf7]"></div>
+        </div>
+        
+        <h1 class="font-serif text-6xl md:text-8xl text-center leading-tight reveal-text visible relative z-10">
             A few <br/>
             <span class="italic">months ago,</span>
         </h1>
@@ -172,14 +182,14 @@
 
     <!-- SECTION 5: CTA / Waitlist -->
     <section id="join" class="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden">
-        <!-- Cloud background with fade effect -->
+        <!-- Field background with fade in effect -->
         <div class="absolute inset-0 -z-10">
-            <!-- Gradient fade from content to clouds -->
-            <div class="absolute inset-0 bg-gradient-to-b from-gray-50 via-gray-50/80 via-60% to-transparent"></div>
-            <!-- Cloud image positioned at bottom -->
+            <!-- Field image positioned at bottom -->
             <div class="absolute inset-0 bg-cover bg-bottom bg-no-repeat" 
-                 style="background-image: url('assets/clouds.png'); opacity: 0.9;">
+                 style="background-image: url('assets/field.png'); opacity: 0.85;">
             </div>
+            <!-- Gradient fade from content to field - fades in gradually -->
+            <div class="absolute inset-0 bg-gradient-to-b from-gray-50 via-50% via-gray-50/60 to-transparent"></div>
         </div>
         
         <div class="text-center max-w-2xl w-full reveal-text relative z-10">
@@ -229,8 +239,8 @@
             </div>
         </div>
 
-        <div class="absolute bottom-8 text-xs text-gray-800 z-10">
-            © 2024 Cowrie. Aptos Assembly.
+        <div class="absolute bottom-8 text-xs text-gray-700 font-medium z-10">
+            © 2025 Cowrie Labs.
         </div>
     </section>
 
