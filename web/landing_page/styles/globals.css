@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    background-color: #Fdfbf7; /* Slightly warm paper tone */
+    color: #1a1a1a;
+}
+
+/* The Reveal Animation Class */
+.reveal-text {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+    filter: blur(4px);
+}
+
+.reveal-text.visible {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+}
+
+/* The Highlighter Effect */
+.highlight-container {
+    position: relative;
+    display: inline-block;
+    z-index: 1;
+}
+
+.highlight-bg {
+    position: absolute;
+    bottom: 2px;
+    left: 0;
+    width: 0%;
+    height: 0.4em;
+    background-color: #ffe85d; /* That specific yellow */
+    z-index: -1;
+    transition: width 0.8s ease-out 0.5s; /* Delay allows text to fade in first */
+    transform: rotate(-1deg);
+}
+
+.reveal-text.visible .highlight-bg {
+    width: 100%;
+}
+
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Hide scrollbar for clean look */
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+

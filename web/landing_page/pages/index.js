@@ -1,0 +1,217 @@
+import { useEffect } from 'react'
+import Head from 'next/head'
+import Image from 'next/image'
+
+export default function Home() {
+  useEffect(() => {
+    // Scroll Observer for reveal animations
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.15 // Trigger when 15% of the element is visible
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        } else {
+          entry.target.classList.remove('visible');
+        }
+      });
+    }, observerOptions);
+
+    const revealElements = document.querySelectorAll('.reveal-text');
+    revealElements.forEach(el => observer.observe(el));
+
+    return () => {
+      revealElements.forEach(el => observer.unobserve(el));
+    };
+  }, []);
+
+  const handleCTAClick = () => {
+    window.open('https://www.linkedin.com/in/mohammed-saabiq-saha-abdulai-099b00257/', '_blank');
+  };
+
+  return (
+    <>
+      <Head>
+        <title>Cowrie | The Missing Link</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </Head>
+
+      {/* Navigation (Minimal) */}
+      <nav className="fixed top-0 w-full p-6 flex justify-between items-center z-50 mix-blend-difference text-white bg-transparent">
+        <div className="flex items-center gap-2 font-sans font-bold tracking-tight">
+          <img src="/assets/cowrie.png" alt="Cowrie" className="h-6 w-6" />
+          <span>Cowrie</span>
+        </div>
+        <a href="#join" className="text-sm font-medium hover:opacity-70 transition-opacity">
+          Start Building
+        </a>
+      </nav>
+
+      {/* SECTION 1: The Hook */}
+      <section className="min-h-screen flex items-center justify-center px-6 relative overflow-hidden">
+        {/* Cloud background with fade out effect at bottom */}
+        <div className="absolute inset-0 -z-10">
+          {/* Cloud image positioned at top */}
+          <div 
+            className="absolute inset-0 bg-cover bg-top bg-no-repeat" 
+            style={{backgroundImage: "url('/assets/clouds.png')", opacity: 0.6}}
+          />
+          {/* Gradient fade - clouds visible at top, fading out smoothly towards bottom */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent from-10% via-[#Fdfbf7]/30 via-70% to-[#Fdfbf7]" />
+        </div>
+        
+        <h1 className="font-serif text-6xl md:text-8xl text-center leading-tight reveal-text visible relative z-10 text-gray-900">
+          A few <br/>
+          <span className="italic">months ago,</span>
+        </h1>
+      </section>
+
+      {/* SECTION 2: The Promise */}
+      <section className="min-h-[80vh] flex flex-col justify-center items-center px-6 max-w-4xl mx-auto">
+        <p className="text-2xl md:text-4xl leading-relaxed font-serif text-center reveal-text">
+          The giants of Silicon Valley made a promise.
+        </p>
+        <div className="h-12" />
+        <p className="text-xl md:text-3xl leading-relaxed text-gray-600 text-center reveal-text max-w-2xl">
+          OpenAI and Anthropic told us <strong className="text-black font-medium">agents</strong> were coming. 
+          They said software would soon book our flights, order our groceries, and handle our lives.
+        </p>
+      </section>
+
+      {/* SECTION 3: The Problem (With Highlight) */}
+      <section className="min-h-[80vh] flex flex-col justify-center items-start px-6 max-w-3xl mx-auto">
+        <div className="space-y-12">
+          <p className="text-3xl md:text-5xl font-serif leading-tight reveal-text">
+            But they missed a <br/>
+            crucial detail.
+          </p>
+          
+          <div className="space-y-6">
+            <p className="text-xl md:text-2xl text-gray-800 leading-relaxed reveal-text">
+              How do we allow these digital brains to <br/>
+              <span className="highlight-container">
+                manage our money?
+                <span className="highlight-bg" />
+              </span>
+            </p>
+
+            <p className="text-lg md:text-xl text-gray-500 leading-relaxed reveal-text">
+              Do you give an AI your credit card number? <br/>
+              Do you trust a black box with your bank login?
+            </p>
+          </div>
+
+          <div className="pl-6 border-l-2 border-gray-200 space-y-6 reveal-text">
+            <p className="text-2xl font-serif italic text-black">
+              Of course you shouldn&apos;t.
+            </p>
+            <p className="text-lg text-gray-600 leading-relaxed">
+              AI hallucinates. And if it does, should it overspend? <br/>
+              Should it execute a transaction you haven&apos;t approved?
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 4: The Solution */}
+      <section className="min-h-[80vh] flex items-center justify-center px-6 bg-white">
+        <div className="max-w-4xl text-center">
+          <p className="text-lg font-sans uppercase tracking-widest text-gray-400 mb-6 reveal-text">
+            The Answer
+          </p>
+          
+          <h2 className="text-4xl md:text-6xl font-serif leading-tight mb-12 reveal-text">
+            We are solving this at <br/>
+            <span className="italic text-indigo-600">Cowrie.</span>
+          </h2>
+
+          <p className="text-xl md:text-3xl text-gray-600 reveal-text max-w-3xl mx-auto leading-relaxed">
+            We are building the <span className="font-semibold text-black">payment infrastructure</span> for your AI agents to safely spend on your behalf.
+            <br/><br/>
+            Intelligent. Autonomous. And <span className="highlight-container">secure by design.<span className="highlight-bg" /></span>
+          </p>
+        </div>
+      </section>
+
+      {/* SECTION 5: CTA / Waitlist */}
+      <section id="join" className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden">
+        {/* Field background with fade in effect */}
+        <div className="absolute inset-0 -z-10">
+          {/* Field image positioned at bottom */}
+          <div 
+            className="absolute inset-0 bg-cover bg-bottom bg-no-repeat" 
+            style={{backgroundImage: "url('/assets/field.png')", opacity: 0.85}}
+          />
+          {/* Gradient fade from content to field - fades in gradually */}
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-50 via-50% via-gray-50/60 to-transparent" />
+        </div>
+        
+        <div className="text-center max-w-2xl w-full reveal-text relative z-10">
+          <h3 className="text-4xl md:text-5xl font-serif font-medium mb-12 text-gray-900">
+            Give your AI the safest <br/>
+            way to make payments.
+          </h3>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full max-w-md mx-auto">
+            <button 
+              onClick={handleCTAClick}
+              className="group w-full sm:w-auto px-10 py-5 bg-black text-white rounded-full font-medium text-lg hover:bg-gray-800 transition-colors duration-300 shadow-xl flex items-center justify-center gap-2"
+            >
+              Start Building with Cowrie
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="20" 
+                height="20" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className="transition-transform duration-300 group-hover:translate-x-1"
+              >
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="mt-16 flex flex-wrap items-center justify-center gap-8 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
+            {/* Aptos */}
+            <div className="flex items-center gap-2">
+              <img src="/assets/Aptos-Network-Full-Logo-Black-RGB-1x.png" alt="Aptos" className="h-5" />
+            </div>
+
+            {/* Move */}
+            <div className="flex items-center gap-2">
+              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="16 18 22 12 16 6" />
+                <polyline points="8 6 2 12 8 18" />
+              </svg>
+              <span className="font-bold text-sm tracking-tight">Move</span>
+            </div>
+
+            {/* Anthropic Logo */}
+            <div className="flex items-center gap-2">
+              <img src="/assets/anthropic.png" alt="Anthropic" className="h-4" />
+            </div>
+
+            {/* ChatGPT Logo */}
+            <div className="flex items-center gap-2">
+              <img src="/assets/ChatGPT-Logo.png" alt="ChatGPT" className="h-5" />
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute bottom-8 text-xs text-gray-800 font-semibold z-10">
+          © 2025 Cowrie Labs
+        </div>
+      </section>
+    </>
+  )
+}
+
