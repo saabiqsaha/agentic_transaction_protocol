@@ -1,0 +1,336 @@
+# Rust SDK
+
+The Rust SDK provides a complete, type-safe implementation of the Agentic Transaction Protocol for Rust applications.
+
+## Installation
+
+Add the SDK to your `Cargo.toml`:
+
+```toml
+[dependencies]
+agentic-protocol = "0.1.0"
+tokio = { version = "1.0", features = ["full"] }
+```
+
+## Requirements
+
+- Rust 1.70 or higher
+- Tokio runtime (for async operations)
+
+## Quick Start
+
+### Basic Usage
+
+```rust
+use agentic_protocol::{AgenticProtocol, Config, CreateTransactionParams};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Initialize the client
+    let client = AgenticProtocol::new(Config {
+        api_key: "your-api-key".to_string(),
+        environment: Environment::Production,
+        ..Default::default()
+    });
+
+    // Create a transaction
+    let tx = client.transactions()
+        .create(CreateTransactionParams {
+            amount: 100,
+            currency: "USD".to_string(),
+            recipient: "agent-123".to_string(),
+            ..Default::default()
+        })
+        .await?;
+
+    println!("Transaction created: {}", tx.id);
+
+    Ok(())
+}
+```
+
+## Configuration
+
+### Client Options
+
+```rust
+use agentic_protocol::{Config, Environment};
+use std::time::Duration;
+
+let config = Config {
+    api_key: "your-api-key".to_string(),
+    environment: Environment::Production,
+    timeout: Duration::from_secs(30),
+    retry_attempts: 3,
+    base_url: Some("https://api.example.com".to_string()),
+};
+
+let client = AgenticProtocol::new(config);
+```
+
+## Core Features
+
+### Transactions
+
+```rust
+use agentic_protocol::{
+    AgenticProtocol,
+    CreateTransactionParams,
+    ListTransactionsParams,
+    TransactionStatus,
+};
+use std::collections::HashMap;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = AgenticProtocol::new(Config::default());
+
+    // Create a transaction
+    let mut metadata = HashMap::new();
+    metadata.insert("order_id".to_string(), "12345".to_string());
+
+    let tx = client.transactions()
+        .create(CreateTransactionParams {
+            amount: 100,
+            currency: "USD".to_string(),
+            recipient: "agent-123".to_string(),
+            metadata: Some(metadata),
+            ..Default::default()
+        })
+        .await?;
+
+    // Get transaction by ID
+    let transaction = client.transactions()
+        .get("tx_123")
+        .await?;
+
+    // List transactions
+    let transactions = client.transactions()
+        .list(ListTransactionsParams {
+            limit: Some(10),
+            status: Some(TransactionStatus::Completed),
+            ..Default::default()
+        })
+        .await?;
+
+    // Cancel a transaction
+    client.transactions()
+        .cancel("tx_123")
+        .await?;
+
+    Ok(())
+}
+```
+
+### Type Safety
+
+The SDK leverages Rust's type system for compile-time safety:
+
+```rust
+use agentic_protocol::{Transaction, TransactionStatus};
+
+fn process_transaction(tx: Transaction) {
+    match tx.status {
+        TransactionStatus::Pending => println!("Transaction is pending"),
+        TransactionStatus::Completed => println!("Transaction completed"),
+        TransactionStatus::Failed => println!("Transaction failed"),
+        TransactionStatus::Cancelled => println!("Transaction cancelled"),
+    }
+}
+```
+
+### Error Handling
+
+```rust
+use agentic_protocol::{AgenticError, ErrorKind};
+
+match client.transactions().create(params).await {
+    Ok(tx) => println!("Transaction created: {}", tx.id),
+    Err(e) => match e.kind() {
+        ErrorKind::Authentication => eprintln!("Invalid API key"),
+        ErrorKind::Validation(msg) => eprintln!("Validation error: {}", msg),
+        ErrorKind::Network(msg) => eprintln!("Network error: {}", msg),
+        ErrorKind::RateLimited => eprintln!("Rate limited, retry later"),
+        _ => eprintln!("Unknown error: {}", e),
+    }
+}
+```
+
+### Event Handling
+
+```rust
+use agentic_protocol::{Event, EventType};
+use tokio_stream::StreamExt;
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = AgenticProtocol::new(Config::default());
+
+    let mut event_stream = client.events().subscribe().await?;
+
+    while let Some(event) = event_stream.next().await {
+        match event {
+            Ok(Event { event_type: EventType::TransactionCreated, data, .. }) => {
+                println!("New transaction: {}", data.id);
+            }
+            Ok(Event { event_type: EventType::TransactionCompleted, data, .. }) => {
+                println!("Transaction completed: {}", data.id);
+            }
+            Err(e) => eprintln!("Event error: {}", e),
+            _ => {}
+        }
+    }
+
+    Ok(())
+}
+```
+
+### Webhooks
+
+Handle incoming webhooks with popular web frameworks:
+
+#### Axum Example
+
+```rust
+use axum::{
+    extract::State,
+    http::StatusCode,
+    routing::post,
+    Json, Router,
+};
+use agentic_protocol::{AgenticProtocol, Event};
+use std::sync::Arc;
+
+#[derive(Clone)]
+struct AppState {
+    client: Arc<AgenticProtocol>,
+}
+
+async fn handle_webhook(
+    State(state): State<AppState>,
+    Json(payload): Json<serde_json::Value>,
+) -> Result<StatusCode, StatusCode> {
+    let signature = /* extract from headers */;
+
+    match state.client.webhooks().verify(&payload, signature) {
+        Ok(event) => {
+            match event.event_type {
+                EventType::TransactionCompleted => {
+                    println!("Transaction completed: {}", event.data.id);
+                }
+                EventType::TransactionFailed => {
+                    println!("Transaction failed: {}", event.data.id);
+                }
+                _ => {}
+            }
+            Ok(StatusCode::OK)
+        }
+        Err(_) => Err(StatusCode::BAD_REQUEST),
+    }
+}
+
+#[tokio::main]
+async fn main() {
+    let client = Arc::new(AgenticProtocol::new(Config::default()));
+
+    let app = Router::new()
+        .route("/webhooks/agentic", post(handle_webhook))
+        .with_state(AppState { client });
+
+    axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
+}
+```
+
+### Builder Pattern
+
+The SDK uses the builder pattern for complex operations:
+
+```rust
+use agentic_protocol::TransactionBuilder;
+
+let tx = client.transactions()
+    .builder()
+    .amount(100)
+    .currency("USD")
+    .recipient("agent-123")
+    .metadata("order_id", "12345")
+    .metadata("user_id", "user-456")
+    .timeout(Duration::from_secs(60))
+    .create()
+    .await?;
+```
+
+### Async Streams
+
+Work with paginated results using async streams:
+
+```rust
+use tokio_stream::StreamExt;
+
+let mut stream = client.transactions()
+    .stream(ListTransactionsParams::default())
+    .await?;
+
+while let Some(result) = stream.next().await {
+    match result {
+        Ok(tx) => println!("Transaction: {}", tx.id),
+        Err(e) => eprintln!("Error: {}", e),
+    }
+}
+```
+
+## Best Practices
+
+1. **Error Handling**: Use Rust's Result type and pattern matching
+2. **Type Safety**: Leverage Rust's type system for compile-time guarantees
+3. **Async/Await**: Use tokio for async operations
+4. **Builder Pattern**: Use builders for complex object construction
+5. **Resource Management**: Let Rust's ownership system handle cleanup
+
+## WebAssembly Support
+
+The SDK can be compiled to WebAssembly:
+
+```toml
+[dependencies]
+agentic-protocol = { version = "0.1.0", features = ["wasm"] }
+```
+
+```rust
+use wasm_bindgen::prelude::*;
+use agentic_protocol::{AgenticProtocol, Config};
+
+#[wasm_bindgen]
+pub async fn create_transaction() -> Result<String, JsValue> {
+    let client = AgenticProtocol::new(Config::default());
+
+    let tx = client.transactions()
+        .create(CreateTransactionParams {
+            amount: 100,
+            currency: "USD".to_string(),
+            recipient: "agent-123".to_string(),
+            ..Default::default()
+        })
+        .await
+        .map_err(|e| JsValue::from_str(&e.to_string()))?;
+
+    Ok(tx.id)
+}
+```
+
+## Examples
+
+Check out complete examples in our [GitHub repository](https://github.com/example/agentic-protocol-rust/tree/main/examples).
+
+## API Reference
+
+For detailed API documentation, run:
+
+```bash
+cargo doc --open
+```
+
+Or visit the [API Reference](/docs/api-reference).

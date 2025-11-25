@@ -1,0 +1,194 @@
+# JavaScript SDK
+
+The JavaScript SDK provides a complete implementation of the Agentic Transaction Protocol for Node.js and browser environments.
+
+## Installation
+
+Install the SDK using npm, yarn, or pnpm:
+
+```bash npm2yarn
+npm install agentic-protocol
+```
+
+## Requirements
+
+- Node.js 16.x or higher
+- TypeScript 4.5+ (optional, but recommended)
+
+## Quick Start
+
+### Basic Usage
+
+```javascript
+import { AgenticProtocol } from 'agentic-protocol';
+
+// Initialize the client
+const client = new AgenticProtocol({
+  apiKey: process.env.AGENTIC_API_KEY,
+  environment: 'production'
+});
+
+// Connect to the protocol
+await client.connect();
+
+// Create a transaction
+const transaction = await client.transactions.create({
+  amount: 100,
+  currency: 'USD',
+  recipient: 'agent-123'
+});
+
+console.log('Transaction created:', transaction.id);
+```
+
+### TypeScript Support
+
+The SDK is written in TypeScript and provides full type definitions:
+
+```typescript
+import { AgenticProtocol, Transaction, TransactionStatus } from 'agentic-protocol';
+
+const client = new AgenticProtocol({
+  apiKey: process.env.AGENTIC_API_KEY!
+});
+
+const transaction: Transaction = await client.transactions.create({
+  amount: 100,
+  currency: 'USD',
+  recipient: 'agent-123'
+});
+
+if (transaction.status === TransactionStatus.PENDING) {
+  console.log('Transaction is pending approval');
+}
+```
+
+## Configuration
+
+### Client Options
+
+```typescript
+interface AgenticProtocolConfig {
+  apiKey: string;
+  environment?: 'development' | 'staging' | 'production';
+  timeout?: number;
+  retryAttempts?: number;
+  baseUrl?: string;
+}
+```
+
+### Example Configuration
+
+```javascript
+const client = new AgenticProtocol({
+  apiKey: 'your-api-key',
+  environment: 'production',
+  timeout: 30000, // 30 seconds
+  retryAttempts: 3
+});
+```
+
+## Core Features
+
+### Transactions
+
+Create, retrieve, and manage transactions:
+
+```javascript
+// Create a transaction
+const tx = await client.transactions.create({
+  amount: 100,
+  currency: 'USD',
+  recipient: 'agent-123'
+});
+
+// Get transaction by ID
+const transaction = await client.transactions.get('tx_123');
+
+// List transactions
+const transactions = await client.transactions.list({
+  limit: 10,
+  status: 'completed'
+});
+
+// Cancel a transaction
+await client.transactions.cancel('tx_123');
+```
+
+### Event Handling
+
+Subscribe to protocol events:
+
+```javascript
+// Listen for transaction events
+client.on('transaction.created', (transaction) => {
+  console.log('New transaction:', transaction.id);
+});
+
+client.on('transaction.completed', (transaction) => {
+  console.log('Transaction completed:', transaction.id);
+});
+
+client.on('error', (error) => {
+  console.error('Protocol error:', error);
+});
+```
+
+### Webhooks
+
+Handle incoming webhooks:
+
+```javascript
+import express from 'express';
+
+const app = express();
+
+app.post('/webhooks/agentic', express.json(), (req, res) => {
+  const event = client.webhooks.verify(req.body, req.headers['signature']);
+
+  switch (event.type) {
+    case 'transaction.completed':
+      console.log('Transaction completed:', event.data);
+      break;
+    case 'transaction.failed':
+      console.log('Transaction failed:', event.data);
+      break;
+  }
+
+  res.status(200).send('OK');
+});
+```
+
+## Error Handling
+
+```javascript
+import { AgenticError, NetworkError, AuthenticationError } from 'agentic-protocol';
+
+try {
+  await client.transactions.create({ /* ... */ });
+} catch (error) {
+  if (error instanceof AuthenticationError) {
+    console.error('Invalid API key');
+  } else if (error instanceof NetworkError) {
+    console.error('Network error:', error.message);
+  } else if (error instanceof AgenticError) {
+    console.error('Protocol error:', error.code, error.message);
+  }
+}
+```
+
+## Best Practices
+
+1. **Use Environment Variables**: Store your API key in environment variables
+2. **Handle Errors**: Always implement proper error handling
+3. **Connection Pooling**: Reuse client instances when possible
+4. **Event Listeners**: Clean up event listeners to prevent memory leaks
+5. **TypeScript**: Use TypeScript for better type safety
+
+## Examples
+
+Check out complete examples in our [GitHub repository](https://github.com/example/agentic-protocol-js/tree/main/examples).
+
+## API Reference
+
+For detailed API documentation, see the [API Reference](/docs/api-reference).

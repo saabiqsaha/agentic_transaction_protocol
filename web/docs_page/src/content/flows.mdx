@@ -1,0 +1,81 @@
+import CustomNodeFlow from '../components/flows/CustomNodeFlow';
+import TransactionFlow from '../components/flows/TransactionFlow';
+import AgentCommunicationFlow from '../components/flows/AgentCommunicationFlow';
+
+# Interactive Flow Diagrams
+
+The Cowrie documentation uses interactive flow diagrams powered by [React Flow](https://reactflow.dev/) to visualize complex processes and architectures.
+
+## Custom Node Flow
+
+This example demonstrates a custom node with a color picker that dynamically changes the background color of the flow diagram.
+
+<CustomNodeFlow />
+
+**Features:**
+- Custom node types with interactive controls
+- Dynamic styling based on user input
+- Multiple output handles from a single node
+- Animated edges showing data flow
+
+---
+
+## Transaction Flow
+
+This diagram illustrates the typical flow of a transaction through the Cowrie protocol.
+
+<TransactionFlow />
+
+**Process Steps:**
+1. **User Request** - Initial transaction request from a user
+2. **Validate Request** - Verify the request format and permissions
+3. **Check Balance** - Ensure sufficient funds are available
+4. **Process Transaction** - Execute the transaction logic
+5. **Update Ledger** - Record the transaction in the distributed ledger
+6. **Transaction Complete** - Return confirmation to the user
+
+---
+
+## Agent Communication Flow
+
+This diagram shows how agents communicate with each other through the Cowrie protocol layer.
+
+<AgentCommunicationFlow />
+
+**Architecture Components:**
+- **Agent A & B** - Autonomous agents participating in transactions
+- **Protocol Layer** - Core communication infrastructure
+- **Authentication** - Security and identity verification
+- **Message Queue** - Asynchronous message handling
+- **Transaction Log** - Permanent record of all communications
+
+---
+
+## Interactive Features
+
+All flow diagrams in this documentation are fully interactive:
+
+- **Drag nodes** to rearrange the layout
+- **Zoom** using the mouse wheel or controls
+- **Pan** by clicking and dragging the background
+- **Connect nodes** by dragging from one handle to another
+- **View minimap** for quick navigation of large diagrams
+
+## Using Flows in Your Documentation
+
+Flow diagrams are perfect for:
+- Visualizing system architecture
+- Documenting complex workflows
+- Explaining data flow between components
+- Interactive tutorials and demonstrations
+- Protocol and API interaction patterns
+
+## Customization
+
+Each flow diagram can be customized with:
+- Custom node types and styles
+- Different edge styles (straight, curved, step)
+- Animations and transitions
+- Interactive controls and inputs
+- Background patterns and colors
+- Mini-map configurations

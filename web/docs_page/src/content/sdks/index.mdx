@@ -1,0 +1,68 @@
+# SDKs Overview
+
+The Agentic Transaction Protocol provides official SDKs for multiple programming languages, making it easy to integrate the protocol into your applications.
+
+## Available SDKs
+
+We currently support the following languages:
+
+- **JavaScript/TypeScript**: For Node.js and browser environments
+- **Python**: For Python 3.8+ applications
+- **Go**: For Go 1.18+ projects
+- **Rust**: For high-performance Rust applications
+
+## Choosing an SDK
+
+Each SDK provides the same core functionality but is optimized for its respective language and ecosystem:
+
+| SDK | Best For | Installation |
+|-----|----------|--------------|
+| JavaScript | Web apps, Node.js services | `npm install agentic-protocol` |
+| Python | Data science, ML applications | `pip install agentic-protocol` |
+| Go | High-performance backends | `go get github.com/example/agentic-protocol` |
+| Rust | Systems programming, WebAssembly | `cargo add agentic-protocol` |
+
+## Common Features
+
+All SDKs provide:
+
+- ✅ Full protocol implementation
+- ✅ Type-safe APIs
+- ✅ Comprehensive error handling
+- ✅ Async/await support
+- ✅ Connection pooling
+- ✅ Built-in retry logic
+- ✅ Extensive documentation
+
+## Quick Start
+
+```javascript
+// JavaScript Example
+import { AgenticProtocol } from 'agentic-protocol';
+
+const client = new AgenticProtocol({
+  apiKey: 'your-api-key'
+});
+
+await client.connect();
+```
+
+```python
+# Python Example
+from agentic_protocol import AgenticProtocol
+
+client = AgenticProtocol(api_key='your-api-key')
+client.connect()
+```
+
+## Getting Help
+
+For SDK-specific questions:
+
+- Check the individual SDK documentation pages
+- Visit our [GitHub Discussions](https://github.com/example/agentic-protocol)
+- Join our [Discord community](https://discord.gg/example)
+
+## Contributing
+
+All our SDKs are open source! Contributions are welcome. See the [Contributing Guide](/docs/contributing) for more details.

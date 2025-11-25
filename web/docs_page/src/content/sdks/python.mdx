@@ -1,0 +1,254 @@
+# Python SDK
+
+The Python SDK provides a complete implementation of the Agentic Transaction Protocol for Python applications.
+
+## Installation
+
+Install the SDK using pip:
+
+```bash
+pip install agentic-protocol
+```
+
+Or with poetry:
+
+```bash
+poetry add agentic-protocol
+```
+
+## Requirements
+
+- Python 3.8 or higher
+- pip or poetry
+
+## Quick Start
+
+### Basic Usage
+
+```python
+from agentic_protocol import AgenticProtocol
+
+# Initialize the client
+client = AgenticProtocol(
+    api_key="your-api-key",
+    environment="production"
+)
+
+# Connect to the protocol
+client.connect()
+
+# Create a transaction
+transaction = client.transactions.create(
+    amount=100,
+    currency="USD",
+    recipient="agent-123"
+)
+
+print(f"Transaction created: {transaction.id}")
+```
+
+### Async Support
+
+The SDK supports both synchronous and asynchronous operations:
+
+```python
+import asyncio
+from agentic_protocol import AsyncAgenticProtocol
+
+async def main():
+    client = AsyncAgenticProtocol(api_key="your-api-key")
+
+    async with client:
+        transaction = await client.transactions.create(
+            amount=100,
+            currency="USD",
+            recipient="agent-123"
+        )
+
+        print(f"Transaction created: {transaction.id}")
+
+asyncio.run(main())
+```
+
+## Configuration
+
+### Client Options
+
+```python
+client = AgenticProtocol(
+    api_key="your-api-key",
+    environment="production",  # 'development', 'staging', or 'production'
+    timeout=30,  # Request timeout in seconds
+    retry_attempts=3,  # Number of retry attempts
+    base_url="https://api.example.com"  # Optional custom base URL
+)
+```
+
+## Core Features
+
+### Transactions
+
+```python
+# Create a transaction
+tx = client.transactions.create(
+    amount=100,
+    currency="USD",
+    recipient="agent-123",
+    metadata={"order_id": "12345"}
+)
+
+# Get transaction by ID
+transaction = client.transactions.get("tx_123")
+
+# List transactions
+transactions = client.transactions.list(
+    limit=10,
+    status="completed"
+)
+
+# Cancel a transaction
+client.transactions.cancel("tx_123")
+```
+
+### Type Hints
+
+The SDK includes comprehensive type hints:
+
+```python
+from agentic_protocol import AgenticProtocol, Transaction, TransactionStatus
+from typing import List
+
+client: AgenticProtocol = AgenticProtocol(api_key="key")
+
+transaction: Transaction = client.transactions.create(
+    amount=100,
+    currency="USD",
+    recipient="agent-123"
+)
+
+if transaction.status == TransactionStatus.PENDING:
+    print("Transaction is pending approval")
+
+transactions: List[Transaction] = client.transactions.list(limit=10)
+```
+
+### Event Handling
+
+```python
+from agentic_protocol import AgenticProtocol, Event
+
+client = AgenticProtocol(api_key="your-api-key")
+
+@client.on("transaction.created")
+def handle_transaction_created(event: Event):
+    print(f"New transaction: {event.data['id']}")
+
+@client.on("transaction.completed")
+def handle_transaction_completed(event: Event):
+    print(f"Transaction completed: {event.data['id']}")
+
+client.start_listening()
+```
+
+### Context Manager Support
+
+```python
+with AgenticProtocol(api_key="your-api-key") as client:
+    transaction = client.transactions.create(
+        amount=100,
+        currency="USD",
+        recipient="agent-123"
+    )
+# Client is automatically closed
+```
+
+## Error Handling
+
+```python
+from agentic_protocol import (
+    AgenticProtocol,
+    AgenticError,
+    AuthenticationError,
+    NetworkError,
+    ValidationError
+)
+
+client = AgenticProtocol(api_key="your-api-key")
+
+try:
+    transaction = client.transactions.create(
+        amount=100,
+        currency="USD",
+        recipient="agent-123"
+    )
+except AuthenticationError:
+    print("Invalid API key")
+except ValidationError as e:
+    print(f"Validation error: {e.message}")
+except NetworkError as e:
+    print(f"Network error: {e.message}")
+except AgenticError as e:
+    print(f"Protocol error: {e.code} - {e.message}")
+```
+
+## Webhooks
+
+Handle incoming webhooks with Flask or FastAPI:
+
+### Flask Example
+
+```python
+from flask import Flask, request
+from agentic_protocol import AgenticProtocol
+
+app = Flask(__name__)
+client = AgenticProtocol(api_key="your-api-key")
+
+@app.route('/webhooks/agentic', methods=['POST'])
+def handle_webhook():
+    signature = request.headers.get('Signature')
+    event = client.webhooks.verify(request.json, signature)
+
+    if event.type == "transaction.completed":
+        print(f"Transaction completed: {event.data['id']}")
+
+    return '', 200
+```
+
+### FastAPI Example
+
+```python
+from fastapi import FastAPI, Request
+from agentic_protocol import AgenticProtocol
+
+app = FastAPI()
+client = AgenticProtocol(api_key="your-api-key")
+
+@app.post("/webhooks/agentic")
+async def handle_webhook(request: Request):
+    body = await request.json()
+    signature = request.headers.get("signature")
+
+    event = client.webhooks.verify(body, signature)
+
+    if event.type == "transaction.completed":
+        print(f"Transaction completed: {event.data['id']}")
+
+    return {"status": "ok"}
+```
+
+## Best Practices
+
+1. **Use Environment Variables**: Store API keys in environment variables
+2. **Type Hints**: Leverage type hints for better IDE support
+3. **Async When Possible**: Use async client for better performance in async applications
+4. **Context Managers**: Use context managers to ensure proper cleanup
+5. **Error Handling**: Always implement proper error handling
+
+## Examples
+
+Check out complete examples in our [GitHub repository](https://github.com/example/agentic-protocol-python/tree/main/examples).
+
+## API Reference
+
+For detailed API documentation, see the [API Reference](/docs/api-reference).

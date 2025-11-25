@@ -1,0 +1,293 @@
+# Go SDK
+
+The Go SDK provides a complete implementation of the Agentic Transaction Protocol for Go applications.
+
+## Installation
+
+Install the SDK using `go get`:
+
+```bash
+go get github.com/example/agentic-protocol-go
+```
+
+## Requirements
+
+- Go 1.18 or higher
+
+## Quick Start
+
+### Basic Usage
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "log"
+
+    agentic "github.com/example/agentic-protocol-go"
+)
+
+func main() {
+    // Initialize the client
+    client := agentic.NewClient(&agentic.Config{
+        APIKey:      "your-api-key",
+        Environment: agentic.Production,
+    })
+
+    ctx := context.Background()
+
+    // Create a transaction
+    tx, err := client.Transactions.Create(ctx, &agentic.CreateTransactionParams{
+        Amount:    100,
+        Currency:  "USD",
+        Recipient: "agent-123",
+    })
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    fmt.Printf("Transaction created: %s\n", tx.ID)
+}
+```
+
+## Configuration
+
+### Client Options
+
+```go
+client := agentic.NewClient(&agentic.Config{
+    APIKey:        "your-api-key",
+    Environment:   agentic.Production, // Development, Staging, or Production
+    Timeout:       30 * time.Second,
+    RetryAttempts: 3,
+    BaseURL:       "https://api.example.com", // Optional
+})
+```
+
+## Core Features
+
+### Transactions
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+
+    agentic "github.com/example/agentic-protocol-go"
+)
+
+func main() {
+    client := agentic.NewClient(&agentic.Config{
+        APIKey: "your-api-key",
+    })
+
+    ctx := context.Background()
+
+    // Create a transaction
+    tx, err := client.Transactions.Create(ctx, &agentic.CreateTransactionParams{
+        Amount:    100,
+        Currency:  "USD",
+        Recipient: "agent-123",
+        Metadata: map[string]string{
+            "order_id": "12345",
+        },
+    })
+    if err != nil {
+        // Handle error
+    }
+
+    // Get transaction by ID
+    transaction, err := client.Transactions.Get(ctx, "tx_123")
+    if err != nil {
+        // Handle error
+    }
+
+    // List transactions
+    transactions, err := client.Transactions.List(ctx, &agentic.ListTransactionsParams{
+        Limit:  10,
+        Status: agentic.TransactionStatusCompleted,
+    })
+    if err != nil {
+        // Handle error
+    }
+
+    // Cancel a transaction
+    err = client.Transactions.Cancel(ctx, "tx_123")
+    if err != nil {
+        // Handle error
+    }
+}
+```
+
+### Error Handling
+
+```go
+import (
+    "errors"
+
+    agentic "github.com/example/agentic-protocol-go"
+)
+
+tx, err := client.Transactions.Create(ctx, params)
+if err != nil {
+    var authErr *agentic.AuthenticationError
+    var validationErr *agentic.ValidationError
+    var networkErr *agentic.NetworkError
+
+    switch {
+    case errors.As(err, &authErr):
+        fmt.Println("Invalid API key")
+    case errors.As(err, &validationErr):
+        fmt.Printf("Validation error: %s\n", validationErr.Message)
+    case errors.As(err, &networkErr):
+        fmt.Printf("Network error: %s\n", networkErr.Message)
+    default:
+        fmt.Printf("Unknown error: %v\n", err)
+    }
+}
+```
+
+### Context Support
+
+The SDK fully supports Go's context package:
+
+```go
+import (
+    "context"
+    "time"
+)
+
+// With timeout
+ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+defer cancel()
+
+tx, err := client.Transactions.Create(ctx, params)
+
+// With cancellation
+ctx, cancel := context.WithCancel(context.Background())
+go func() {
+    // Cancel after some condition
+    cancel()
+}()
+
+tx, err := client.Transactions.Create(ctx, params)
+```
+
+### Event Handling
+
+```go
+// Subscribe to events
+eventChan := make(chan *agentic.Event)
+errChan := make(chan error)
+
+go client.Events.Subscribe(ctx, eventChan, errChan)
+
+for {
+    select {
+    case event := <-eventChan:
+        switch event.Type {
+        case agentic.EventTypeTransactionCreated:
+            fmt.Printf("New transaction: %s\n", event.Data.ID)
+        case agentic.EventTypeTransactionCompleted:
+            fmt.Printf("Transaction completed: %s\n", event.Data.ID)
+        }
+    case err := <-errChan:
+        log.Printf("Event error: %v\n", err)
+    case <-ctx.Done():
+        return
+    }
+}
+```
+
+### Webhooks
+
+Handle incoming webhooks:
+
+```go
+package main
+
+import (
+    "fmt"
+    "net/http"
+
+    agentic "github.com/example/agentic-protocol-go"
+)
+
+func main() {
+    client := agentic.NewClient(&agentic.Config{
+        APIKey: "your-api-key",
+    })
+
+    http.HandleFunc("/webhooks/agentic", func(w http.ResponseWriter, r *http.Request) {
+        signature := r.Header.Get("Signature")
+
+        event, err := client.Webhooks.Verify(r.Body, signature)
+        if err != nil {
+            http.Error(w, "Invalid signature", http.StatusBadRequest)
+            return
+        }
+
+        switch event.Type {
+        case agentic.EventTypeTransactionCompleted:
+            fmt.Printf("Transaction completed: %s\n", event.Data.ID)
+        case agentic.EventTypeTransactionFailed:
+            fmt.Printf("Transaction failed: %s\n", event.Data.ID)
+        }
+
+        w.WriteHeader(http.StatusOK)
+    })
+
+    http.ListenAndServe(":8080", nil)
+}
+```
+
+## Concurrency
+
+The SDK is safe for concurrent use:
+
+```go
+import "sync"
+
+var wg sync.WaitGroup
+
+for i := 0; i < 10; i++ {
+    wg.Add(1)
+    go func(i int) {
+        defer wg.Done()
+
+        tx, err := client.Transactions.Create(ctx, &agentic.CreateTransactionParams{
+            Amount:    100 * i,
+            Currency:  "USD",
+            Recipient: fmt.Sprintf("agent-%d", i),
+        })
+        if err != nil {
+            log.Printf("Error creating transaction %d: %v\n", i, err)
+            return
+        }
+
+        fmt.Printf("Transaction %d created: %s\n", i, tx.ID)
+    }(i)
+}
+
+wg.Wait()
+```
+
+## Best Practices
+
+1. **Use Context**: Always pass context for timeouts and cancellation
+2. **Error Handling**: Use type assertions for specific error types
+3. **Concurrency**: The client is safe for concurrent use
+4. **Resource Cleanup**: Use defer for cleanup operations
+5. **Environment Variables**: Store API keys in environment variables
+
+## Examples
+
+Check out complete examples in our [GitHub repository](https://github.com/example/agentic-protocol-go/tree/main/examples).
+
+## API Reference
+
+For detailed API documentation, see the [API Reference](/docs/api-reference).
