@@ -172,10 +172,17 @@
 
     <!-- SECTION 5: CTA / Waitlist -->
     <section id="join" class="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden">
-        <!-- Subtle background decoration -->
-        <div class="absolute inset-0 bg-gray-50 -z-10"></div>
+        <!-- Cloud background with fade effect -->
+        <div class="absolute inset-0 -z-10">
+            <!-- Gradient fade from content to clouds -->
+            <div class="absolute inset-0 bg-gradient-to-b from-gray-50 via-gray-50/80 via-60% to-transparent"></div>
+            <!-- Cloud image positioned at bottom -->
+            <div class="absolute inset-0 bg-cover bg-bottom bg-no-repeat" 
+                 style="background-image: url('assets/clouds.png'); opacity: 0.9;">
+            </div>
+        </div>
         
-        <div class="text-center max-w-2xl w-full reveal-text">
+        <div class="text-center max-w-2xl w-full reveal-text relative z-10">
             <h3 class="text-4xl md:text-5xl font-serif font-medium mb-6">
                 Give your AI the safest <br/>
                 way to make payments.
@@ -222,7 +229,7 @@
             </div>
         </div>
 
-        <div class="absolute bottom-8 text-xs text-gray-400">
+        <div class="absolute bottom-8 text-xs text-gray-800 z-10">
             © 2024 Cowrie. Aptos Assembly.
         </div>
     </section>
