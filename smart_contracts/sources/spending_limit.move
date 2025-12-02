@@ -37,6 +37,7 @@ module cowrie::spending_limit {
     }
 
     /// Check if a spend is allowed (view function)
+    #[view]
     public fun check_spend(owner: address, amount: u64): bool acquires Mandate {
         if (!exists<Mandate>(owner)) {
             return false
@@ -73,10 +74,19 @@ module cowrie::spending_limit {
     }
 
     /// Get available balance for spending
+    #[view]
     public fun get_available(owner: address): u64 acquires Mandate {
         assert!(exists<Mandate>(owner), E_MANDATE_NOT_FOUND);
         let mandate = borrow_global<Mandate>(owner);
         get_available_balance(mandate)
+    }
+
+    /// Get mandate details
+    #[view]
+    public fun get_mandate_info(owner: address): (u64, u64, address, u64) acquires Mandate {
+        assert!(exists<Mandate>(owner), E_MANDATE_NOT_FOUND);
+        let mandate = borrow_global<Mandate>(owner);
+        (mandate.limit, mandate.spent, mandate.agent, mandate.period_seconds)
     }
 
     /// Internal: calculate available balance, considering reset
