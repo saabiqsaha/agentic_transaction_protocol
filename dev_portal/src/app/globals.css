@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+:root {
+  --background: #Fdfbf7;
+  --foreground: #111827;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-paper: #Fdfbf7;
+  --color-ink: #111827;
+  --color-highlight: #FDE047;
+
+  --font-sans: var(--font-inter), sans-serif;
+  --font-serif: var(--font-playfair), serif;
+  --font-space: var(--font-space), sans-serif;
+
+  --image-marker: linear-gradient(120deg, #FDE047 0%, #FDE047 100%);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}

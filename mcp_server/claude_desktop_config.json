@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "cowrie": {
+      "command": "node",
+      "args": ["/Users/saha/Documents/agentic_transaction_protocol/mcp_server/dist/index.js"],
+      "env": {
+        "AGENT_PRIVATE_KEY": "0x82c363e30ed5b105c83881ca09d77885773008743c0beb7525dab0f26c601b72"
+      }
+    }
+  }
+}
