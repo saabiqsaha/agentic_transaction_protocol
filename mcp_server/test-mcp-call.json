@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"check_mandate","arguments":{"owner_address":"0x9b81f7c089535e3cdd6f4b985461cf4beb2b548726815b2e961facd58fae0b8b"}}}
