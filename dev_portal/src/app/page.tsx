@@ -1,13 +1,18 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import MCPConfigModal from "@/components/MCPConfigModal";
 
 export default function Home() {
+  const [showMCPConfig, setShowMCPConfig] = useState(false);
+
   const menuItems = [
     { name: 'Home', icon: 'home', href: '/' },
-    { name: 'Tokens', icon: 'token', href: '/tokens' },
-    { name: 'Charges', icon: 'payments', href: '/charges' },
-    { name: 'Playground', icon: 'terminal', href: '/playground' },
-    { name: 'Buyer API Keys', icon: 'key', href: '/api-keys' },
+    { name: 'Activity', icon: 'payments', href: '/charges' },
+    { name: 'Agent Playground', icon: 'terminal', href: '/playground' },
+    { name: 'API Keys', icon: 'key', href: '/api-keys' },
   ];
 
   const secondaryItems = [
@@ -17,7 +22,10 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen bg-paper text-ink font-sans">
-      {/* Sidebar Placeholder */}
+      {/* MCP Config Modal */}
+      <MCPConfigModal isOpen={showMCPConfig} onClose={() => setShowMCPConfig(false)} />
+
+      {/* Sidebar */}
       <aside className="w-64 border-r border-gray-200 p-6 hidden md:block">
         <div className="flex items-center gap-2 mb-8">
           <Image src="/cowrie.png" alt="Cowrie Logo" width={32} height={32} className="w-8 h-8" />
@@ -52,52 +60,55 @@ export default function Home() {
             </button>
           </div>
 
-          {/* Header */}
+          {/* Agent Onboarding Checklist */}
           <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h1 className="text-xl font-semibold mb-1">Buyer Onboarding Checklist</h1>
-                <p className="text-gray-500 text-sm">Complete these steps to get started using Cowrie as a buyer.</p>
+                <h1 className="text-xl font-semibold mb-1">Agent Onboarding Checklist</h1>
+                <p className="text-gray-500 text-sm">Enable your AI agents to make autonomous payments with spending limits.</p>
               </div>
               <span className="text-sm text-gray-400">0/3</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Card 1 */}
-              <div className="bg-paper p-5 rounded-lg border border-gray-100 hover:border-highlight transition-colors cursor-pointer group">
+              {/* Card 1: Create Mandate */}
+              <Link href="/create-mandate" className="bg-paper p-5 rounded-lg border border-gray-100 hover:border-highlight transition-colors cursor-pointer group">
                 <div className="flex justify-between items-start mb-3">
                   <div className="p-2 bg-white rounded-md border border-gray-100">
-                    <span className="material-symbols-outlined text-gray-700">school</span>
+                    <span className="material-symbols-outlined text-gray-700">psychology</span>
                   </div>
                   <div className="w-5 h-5 rounded-full border-2 border-gray-200 group-hover:border-gray-300"></div>
                 </div>
-                <h3 className="font-medium mb-2">Learn how to use tokens</h3>
-                <p className="text-xs text-gray-500 leading-relaxed">Visit our interactive playground and learn how to create a token and use it to access services.</p>
+                <h3 className="font-medium mb-2">Create a Spending Mandate</h3>
+                <p className="text-xs text-gray-500 leading-relaxed">Set up spending limits for your AI agent. Define daily budgets and authorize your agent to make autonomous payments on-chain.</p>
+              </Link>
+
+              {/* Card 2: Connect Agent */}
+              <div
+                onClick={() => setShowMCPConfig(true)}
+                className="bg-paper p-5 rounded-lg border border-gray-100 hover:border-highlight transition-colors cursor-pointer group"
+              >
+                <div className="flex justify-between items-start mb-3">
+                  <div className="p-2 bg-white rounded-md border border-gray-100">
+                    <span className="material-symbols-outlined text-gray-700">smart_toy</span>
+                  </div>
+                  <div className="w-5 h-5 rounded-full border-2 border-gray-200 group-hover:border-gray-300"></div>
+                </div>
+                <h3 className="font-medium mb-2">Connect Your Agent</h3>
+                <p className="text-xs text-gray-500 leading-relaxed">Integrate your AI agent using our SDK. Test autonomous payments in the playground with real blockchain transactions.</p>
               </div>
 
-              {/* Card 2 */}
-              <div className="bg-paper p-5 rounded-lg border border-gray-100 hover:border-highlight transition-colors cursor-pointer group">
+              {/* Card 3: Monitor Activity */}
+              <Link href="/charges" className="bg-paper p-5 rounded-lg border border-gray-100 hover:border-highlight transition-colors cursor-pointer group">
                 <div className="flex justify-between items-start mb-3">
                   <div className="p-2 bg-white rounded-md border border-gray-100">
-                    <span className="material-symbols-outlined text-gray-700">verified_user</span>
+                    <span className="material-symbols-outlined text-gray-700">receipt_long</span>
                   </div>
                   <div className="w-5 h-5 rounded-full border-2 border-gray-200 group-hover:border-gray-300"></div>
                 </div>
-                <h3 className="font-medium mb-2">Get Verified</h3>
-                <p className="text-xs text-gray-500 leading-relaxed">Get verified to access more services. Some providers require additional verification to use their services.</p>
-              </div>
-
-              {/* Card 3 */}
-              <div className="bg-paper p-5 rounded-lg border border-gray-100 hover:border-highlight transition-colors cursor-pointer group">
-                <div className="flex justify-between items-start mb-3">
-                  <div className="p-2 bg-white rounded-md border border-gray-100">
-                    <span className="material-symbols-outlined text-gray-700">storefront</span>
-                  </div>
-                  <div className="w-5 h-5 rounded-full border-2 border-gray-200 group-hover:border-gray-300"></div>
-                </div>
-                <h3 className="font-medium mb-2">Create a Seller Account</h3>
-                <p className="text-xs text-gray-500 leading-relaxed">Interested in offering your own services? Set up a seller account to start providing value to other users.</p>
-              </div>
+                <h3 className="font-medium mb-2">Monitor Agent Activity</h3>
+                <p className="text-xs text-gray-500 leading-relaxed">Track your agent's spending in real-time. View transaction history, remaining balance, and mandate status on the blockchain.</p>
+              </Link>
             </div>
           </div>
 
@@ -107,39 +118,31 @@ export default function Home() {
               <div className="flex items-center gap-2 mb-1">
                 <h2 className="font-semibold text-gray-900">Available Balance</h2>
                 <span className="material-symbols-outlined text-gray-400 text-sm">info</span>
+                <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full font-medium">Powered by Aptos</span>
               </div>
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-bold font-space tracking-tight">0.3000000</span>
-                <span className="text-sm font-medium text-gray-500">USD</span>
+                <span className="text-sm font-medium text-gray-500">APT</span>
               </div>
             </div>
             <div className="flex gap-3">
               <button className="px-4 py-2 bg-ink text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors">
                 Fund Wallet
               </button>
-              <button className="px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
-                <span className="material-symbols-outlined text-[18px]">history</span>
-                Activity
-              </button>
+              <Link href="/charges">
+                <button className="px-4 py-2 bg-white border border-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[18px]">history</span>
+                  Activity
+                </button>
+              </Link>
             </div>
           </div>
 
-          {/* Tokens Section */}
-          <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm min-h-[300px]">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="font-semibold text-gray-900">Tokens</h2>
-              <button className="text-sm font-medium text-gray-900 flex items-center gap-1 hover:opacity-70">
-                View All
-                <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-              </button>
-            </div>
-
-            <div className="flex flex-col items-center justify-center py-12 border border-dashed border-gray-200 rounded-lg bg-gray-50/50">
-              <div className="w-12 h-12 bg-white rounded-lg border border-gray-200 flex items-center justify-center mb-4 shadow-sm">
-                <span className="material-symbols-outlined text-gray-400">generating_tokens</span>
-              </div>
-              <p className="font-medium text-gray-900">No active tokens available</p>
-            </div>
+          {/* Footer Note */}
+          <div className="text-center py-4">
+            <p className="text-xs text-gray-400">
+              All transactions are secured on-chain via Aptos blockchain • Real-time mandate enforcement
+            </p>
           </div>
 
         </div>
