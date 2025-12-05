@@ -4,14 +4,22 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useWallet } from "@aptos-labs/wallet-adapter-react";
+import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
+import { WalletButton } from "@/components/WalletButton";
+
+const CONTRACT_ADDRESS = "0x1d26c3239b30cd2a8f8c88f525d8ed0d0da3aa93f1d3f57221dd42abbfa4f67d";
+const MODULE_NAME = "spending_limit";
 
 export default function CreateMandate() {
   const router = useRouter();
+  const { account, signAndSubmitTransaction, connected } = useWallet();
   const [step, setStep] = useState(1);
   const [agentAddress, setAgentAddress] = useState("");
   const [spendingLimit, setSpendingLimit] = useState("");
   const [period, setPeriod] = useState("86400");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [txHash, setTxHash] = useState<string>("");
 
   const menuItems = [
     { name: 'Home', icon: 'home', href: '/' },
@@ -26,23 +34,65 @@ export default function CreateMandate() {
   ];
 
   const handleSubmit = async () => {
+    if (!connected || !account) {
+      alert("Please connect your wallet first");
+      return;
+    }
+
+    // Check if wallet is on testnet
+    const config = new AptosConfig({ network: Network.TESTNET });
+    const aptos = new Aptos(config);
+
+    try {
+      // Try to fetch the contract to verify network
+      await aptos.getAccountModule({
+        accountAddress: CONTRACT_ADDRESS,
+        moduleName: MODULE_NAME,
+      });
+    } catch (error) {
+      alert("⚠️ Network Mismatch!\n\nPlease switch your Petra wallet to TESTNET.\n\n1. Click Petra extension\n2. Select 'Testnet' from network dropdown\n3. Try again");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      // TODO: Integrate with Petra wallet and call smart contract
+      // Convert APT to octas (1 APT = 100,000,000 octas)
+      const limitInOctas = Math.floor(parseFloat(spendingLimit) * 100_000_000);
+      const periodInSeconds = parseInt(period);
+
       console.log("Creating mandate:", {
-        agentAddress,
-        spendingLimit,
-        period,
+        agent: agentAddress,
+        limit: limitInOctas,
+        period: periodInSeconds,
       });
 
-      // Simulate transaction
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Build and submit transaction
+      const response = await signAndSubmitTransaction({
+        sender: account.address,
+        data: {
+          function: `${CONTRACT_ADDRESS}::${MODULE_NAME}::create_mandate`,
+          functionArguments: [agentAddress, limitInOctas, periodInSeconds],
+        },
+      });
 
+      console.log("Transaction submitted:", response);
+      setTxHash(response.hash);
+
+      // Initialize Aptos client to wait for transaction
+      const config = new AptosConfig({ network: Network.TESTNET });
+      const aptos = new Aptos(config);
+
+      // Wait for transaction confirmation
+      await aptos.waitForTransaction({
+        transactionHash: response.hash,
+      });
+
+      console.log("Transaction confirmed!");
       setStep(3); // Success step
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating mandate:", error);
-      alert("Failed to create mandate");
+      alert(`Failed to create mandate: ${error.message || "Unknown error"}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -84,6 +134,11 @@ export default function CreateMandate() {
       {/* Main Content */}
       <main className="flex-1 p-8">
         <div className="max-w-2xl mx-auto">
+          {/* Wallet Button */}
+          <div className="flex justify-end mb-6">
+            <WalletButton />
+          </div>
+
           {/* Progress Steps */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
@@ -239,6 +294,15 @@ export default function CreateMandate() {
                 </p>
               </div>
 
+              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg mb-6">
+                <p className="text-sm text-yellow-800 font-medium mb-1">
+                  ⚠️ Make sure Petra is set to TESTNET
+                </p>
+                <p className="text-xs text-yellow-700">
+                  The contract is deployed on Aptos Testnet. Switch networks in your Petra wallet if needed.
+                </p>
+              </div>
+
               <div className="flex gap-3">
                 <button
                   onClick={() => setStep(1)}
@@ -269,6 +333,22 @@ export default function CreateMandate() {
               <p className="text-gray-500 mb-6">
                 Your AI agent is now authorized to make autonomous payments within the spending limit.
               </p>
+
+              {txHash && (
+                <div className="p-4 bg-gray-50 rounded-lg mb-6 text-left">
+                  <p className="text-xs text-gray-500 mb-2">Transaction Hash</p>
+                  <p className="font-mono text-xs break-all mb-2">{txHash}</p>
+                  <a
+                    href={`https://explorer.aptoslabs.com/txn/${txHash}?network=testnet`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
+                  >
+                    View on Aptos Explorer
+                    <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+                  </a>
+                </div>
+              )}
 
               <div className="p-4 bg-gray-50 rounded-lg mb-6 text-left">
                 <p className="text-xs text-gray-500 mb-2">Next Steps:</p>

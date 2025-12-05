@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import { WalletProvider } from "@/components/WalletProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -38,7 +39,9 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${playfair.variable} ${spaceGrotesk.variable} antialiased`}
       >
-        {children}
+        <WalletProvider>
+          {children}
+        </WalletProvider>
       </body>
     </html>
   );

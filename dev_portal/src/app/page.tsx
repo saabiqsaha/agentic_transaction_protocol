@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import MCPConfigModal from "@/components/MCPConfigModal";
+import { WalletButton } from "@/components/WalletButton";
 
 export default function Home() {
   const [showMCPConfig, setShowMCPConfig] = useState(false);
@@ -54,10 +55,7 @@ export default function Home() {
 
           {/* Top Bar with Connect Wallet */}
           <div className="flex justify-end">
-            <button className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-800 transition-colors">
-              <span className="material-symbols-outlined text-[20px]">account_balance_wallet</span>
-              Connect Wallet
-            </button>
+            <WalletButton />
           </div>
 
           {/* Agent Onboarding Checklist */}
