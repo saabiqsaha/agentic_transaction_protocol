@@ -4,7 +4,7 @@ version = "1.0.0"
 authors = []
 
 [addresses]
-cowrie = "0x9b81f7c089535e3cdd6f4b985461cf4beb2b548726815b2e961facd58fae0b8b"
+cowrie = "0x1d26c3239b30cd2a8f8c88f525d8ed0d0da3aa93f1d3f57221dd42abbfa4f67d"
 
 [dev-addresses]
 

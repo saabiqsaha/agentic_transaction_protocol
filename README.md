@@ -16,7 +16,7 @@
 ```bash
 cd smart_contracts
 aptos move compile
-aptos move publish --url https://fullnode.devnet.aptoslabs.com/v1 --assume-yes
+aptos move publish --profile testnet_deploy --assume-yes
 ```
 
 ### MCP Server
@@ -45,11 +45,12 @@ This file contains:
 - Known issues and TODOs
 - Important decisions and context
 
-## Deployed Contracts (Devnet)
+## Deployed Contracts (Testnet)
 
-- **Contract**: `0x9b81f7c089535e3cdd6f4b985461cf4beb2b548726815b2e961facd58fae0b8b`
+- **Contract**: `0x1d26c3239b30cd2a8f8c88f525d8ed0d0da3aa93f1d3f57221dd42abbfa4f67d`
 - **Module**: `spending_limit`
-- **Explorer**: [View on Aptos Explorer](https://explorer.aptoslabs.com/account/0x9b81f7c089535e3cdd6f4b985461cf4beb2b548726815b2e961facd58fae0b8b?network=devnet)
+- **Explorer**: [View on Aptos Explorer](https://explorer.aptoslabs.com/account/0x1d26c3239b30cd2a8f8c88f525d8ed0d0da3aa93f1d3f57221dd42abbfa4f67d?network=testnet)
+- **Deploy TX**: [0xd4f8b5c1...](https://explorer.aptoslabs.com/txn/0xd4f8b5c1a75a97e1b90e5dfe18dc83ab970d652b1cd273001b06351ed40da9ea?network=testnet)
 
 ## MCP Server Tools
 
@@ -68,7 +69,7 @@ Successfully integrated with Claude Desktop:
 - 🚧 Petra wallet integration (TODO)
 - 🚧 Dark mode (TODO)
 
-**Smart Contracts**: Production-ready, deployed on devnet
+**Smart Contracts**: Production-ready, deployed on testnet
 
 **MCP Server**: Working, tested with real blockchain transactions
 

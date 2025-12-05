@@ -10,11 +10,11 @@ import { Aptos, AptosConfig, Network, Account, Ed25519PrivateKey } from "@aptos-
 import { z } from "zod";
 
 // Contract configuration
-const CONTRACT_ADDRESS = "0x9b81f7c089535e3cdd6f4b985461cf4beb2b548726815b2e961facd58fae0b8b";
+const CONTRACT_ADDRESS = "0x1d26c3239b30cd2a8f8c88f525d8ed0d0da3aa93f1d3f57221dd42abbfa4f67d";
 const MODULE_NAME = "spending_limit";
 
 // Initialize Aptos client
-const config = new AptosConfig({ network: Network.DEVNET });
+const config = new AptosConfig({ network: Network.TESTNET });
 const aptos = new Aptos(config);
 
 // Agent account - load from environment variable

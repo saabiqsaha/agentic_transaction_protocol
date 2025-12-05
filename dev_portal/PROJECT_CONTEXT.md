@@ -7,7 +7,7 @@ Think of it as "Stripe for AI Agents" - users authorize AI agents to spend on th
 
 ## Tech Stack
 - **Frontend**: Next.js 16 (App Router), TypeScript, Tailwind CSS
-- **Blockchain**: Aptos (Devnet)
+- **Blockchain**: Aptos (Testnet)
 - **Smart Contract**: Move language (`spending_limit.move`)
 - **MCP Server**: TypeScript with Aptos SDK (enables Claude to interact with blockchain)
 
@@ -39,10 +39,11 @@ agentic_transaction_protocol/
 
 ## Key Deployed Contracts
 
-**Spending Limit Contract (Devnet)**
-- Address: `0x9b81f7c089535e3cdd6f4b985461cf4beb2b548726815b2e961facd58fae0b8b`
+**Spending Limit Contract (Testnet)**
+- Address: `0x1d26c3239b30cd2a8f8c88f525d8ed0d0da3aa93f1d3f57221dd42abbfa4f67d`
 - Module: `spending_limit`
-- Network: Aptos Devnet
+- Network: Aptos Testnet
+- Deploy TX: `0xd4f8b5c1a75a97e1b90e5dfe18dc83ab970d652b1cd273001b06351ed40da9ea`
 
 ## Current Features (Completed)
 
@@ -143,7 +144,18 @@ The MCP server at `../mcp_server` enables Claude to:
 2. **execute_payment** - Execute payments within spending limits
 3. **get_transaction_status** - Check transaction completion
 
-**Successfully tested**: Claude can query mandates and execute real transactions on devnet!
+**Successfully tested**: Claude can query mandates and execute real transactions on testnet!
+
+### Test Mandate on Testnet
+A test mandate has been deployed for demos:
+- **Owner**: `0x1d26c3239b30cd2a8f8c88f525d8ed0d0da3aa93f1d3f57221dd42abbfa4f67d`
+- **Agent**: `0x88e9716c0ec5d5a2cacb3287a18daff9506ab5e6f4820ee39cd1cd9f27847d46`
+- **Limit**: 1 APT (100,000,000 octas)
+- **Period**: Daily (86,400 seconds)
+- **Creation TX**: `0x337e5f5d10b1e893c65e7f9932f64dcb567f9ec0b43f63d60c7c33ad09c37514`
+
+### Demo Script
+See `../DEMO_SCRIPT.md` for complete testing and demo instructions.
 
 ## Git Workflow
 
@@ -174,8 +186,28 @@ User provided Petra Web screenshot showing:
 
 This should guide the balance section redesign.
 
-## Questions to Ask User
-- Should we implement Petra wallet connection first?
-- Priority: Dark mode or balance section redesign?
-- Do you have test data for the Activity page?
-- What should Agent Playground do? (test payments, simulate scenarios?)
+## Important Notes for Future Sessions
+
+### Testnet Migration Complete (Dec 2024)
+- ✅ Migrated from devnet to testnet for stability
+- ✅ Testnet is more stable (doesn't reset frequently like devnet)
+- ✅ All transactions use fake APT but execute real blockchain logic
+- ✅ MCP server configured for testnet
+
+### Current Smart Contract Behavior
+- ⚠️ **Important**: `execute_spend` currently only **tracks spending**, it does NOT transfer APT to recipients
+- To add actual transfers, the smart contract needs to be enhanced with `coin::transfer<AptosCoin>` functionality
+- This is intentional for the MVP - demonstrates mandate enforcement without actual money movement
+
+### Testing & Demo
+- See `../DEMO_SCRIPT.md` for complete testing instructions
+- Test mandate is live on testnet (owner: `0x1d26...`)
+- Can demo autonomous payments through Claude Desktop
+- Transactions are viewable on Aptos Explorer (testnet)
+
+### Next Priority Tasks
+- [ ] Petra wallet integration for mandate creation UI
+- [ ] Connect Activity page to real blockchain data (use Geomi indexer?)
+- [ ] Implement dark mode
+- [ ] Consider Geomi Gas Station for sponsoring user transactions
+- [ ] Enhance smart contract to actually transfer APT (if needed)
